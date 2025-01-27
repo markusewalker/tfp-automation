@@ -95,6 +95,10 @@ type Nodepool struct {
 	MaxPodsContraint int64  `json:"maxPodsContraint,omitempty" yaml:"maxPodsContraint,omitempty"`
 }
 
+type Proxy struct {
+	ProxyBastion string `json:"proxyBastion,omitempty" yaml:"proxyBastion,omitempty"`
+}
+
 type PrivateRegistries struct {
 	AuthConfigSecretName   string `json:"authConfigSecretName,omitempty" yaml:"authConfigSecretName,omitempty"`
 	CABundle               string `json:"caBundle,omitempty" yaml:"caBundle,omitempty"`
@@ -166,6 +170,7 @@ type TerraformConfig struct {
 	NodeTemplateName                    string                       `json:"nodeTemplateName,omitempty" yaml:"nodeTemplateName,omitempty"`
 	PrivateKeyPath                      string                       `json:"privateKeyPath,omitempty" yaml:"privateKeyPath,omitempty"`
 	PrivateRegistries                   *PrivateRegistries           `json:"privateRegistries,omitempty" yaml:"privateRegistries,omitempty"`
+	Proxy                               *Proxy                       `json:"proxy,omitempty" yaml:"proxy,omitempty"`
 	Standalone                          *Standalone                  `json:"standalone,omitempty" yaml:"standalone,omitempty"`
 	StandaloneRegistry                  *StandaloneRegistry          `json:"standaloneRegistry,omitempty" yaml:"standaloneRegistry,omitempty"`
 }
