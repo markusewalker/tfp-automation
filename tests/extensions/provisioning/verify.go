@@ -80,6 +80,8 @@ func VerifyRancherVersion(t *testing.T, hostURL, expectedVersion, keyPath string
 	resp, err := RequestRancherVersion(hostURL)
 	require.NoError(t, err)
 
+	logrus.Infof("Rancher version: %s | Rancher commit: %s", resp.RancherVersion, resp.GitCommit)
+
 	if resp.RancherVersion != expectedVersion {
 		logrus.Infof("Expected version: %s | Actual version: %s", expectedVersion, resp.RancherVersion)
 		cleanup.Cleanup(t, terraformOptions, keyPath)
