@@ -79,6 +79,8 @@ func (r *TfpRegistriesTestSuite) TestTfpGlobalRegistry() {
 		nodeRoles []config.Nodepool
 	}{
 		{"Global_RKE2", modules.EC2RKE2, nodeRolesDedicated},
+		{"Global_RKE2_Windows_2019", modules.CustomEC2RKE2Windows2019, nil},
+		{"Global_RKE2_Windows_2022", modules.CustomEC2RKE2Windows2022, nil},
 		{"Global_K3S", modules.EC2K3s, nodeRolesAll},
 	}
 
@@ -251,6 +253,8 @@ func (r *TfpRegistriesTestSuite) TestTfpNonAuthenticatedRegistry() {
 		nodeRoles []config.Nodepool
 	}{
 		{"Non_Auth_RKE2", modules.EC2RKE2, nodeRolesDedicated},
+		{"Non_Auth_RKE2_Windows_2019", modules.CustomEC2RKE2Windows2019, nil},
+		{"Non_Auth_RKE2_Windows_2022", modules.CustomEC2RKE2Windows2022, nil},
 		{"Non_Auth_K3S", modules.EC2K3s, nodeRolesAll},
 	}
 
@@ -331,6 +335,7 @@ func (r *TfpRegistriesTestSuite) TestTfpECRRegistry() {
 
 	standardToken := standardUserToken.Token
 
+	nodeRolesAll := []config.Nodepool{config.AllRolesNodePool}
 	nodeRolesDedicated := []config.Nodepool{config.EtcdNodePool, config.ControlPlaneNodePool, config.WorkerNodePool}
 
 	tests := []struct {
@@ -338,7 +343,8 @@ func (r *TfpRegistriesTestSuite) TestTfpECRRegistry() {
 		module    string
 		nodeRoles []config.Nodepool
 	}{
-		{"ECR_RKE2", "ec2_rke2", nodeRolesDedicated},
+		{"ECR_RKE2", modules.EC2RKE2, nodeRolesDedicated},
+		{"ECR_K3S", modules.EC2K3s, nodeRolesAll},
 	}
 
 	for _, tt := range tests {

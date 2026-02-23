@@ -191,6 +191,13 @@ jobs:
               awsUser: "${{ secrets.AWS_USER }}"
               sshConnectionType: "${{ vars.SSH_CONNECTION_TYPE }}" 
               timeout: "${{ vars.TIMEOUT }}"
+              windowsAWSUser: "${{ secrets.AWS_WINDOWS_USER }}" 
+              windows2019AMI: "${{ secrets.WINDOWS_2019_AMI }}"
+              windows2022AMI: "${{ secrets.WINDOWS_2022_AMI }}"
+              windows2019Password: "${{ secrets.AWS_WINDOWS_2019_PASSWORD }}"
+              windows2022Password: "${{ secrets.AWS_WINDOWS_2022_PASSWORD }}"
+              windowsInstanceType: "${{ vars.AWS_WINDOWS_INSTANCE_TYPE }}"
+              windowsKeyName: "${{ secrets.WINDOWS_SSH_PRIVATE_KEY_NAME }}"
               ipAddressType: "${{ vars.IP_ADDRESS_TYPE }}"
               loadBalancerType: "${{ vars.LOAD_BALANCER_TYPE }}"
               targetType: "${{ vars.TARGET_TYPE }}"
@@ -219,6 +226,10 @@ jobs:
               ecrURI: "${{ secrets.ECR_URI }}"
           terratest:
             pathToRepo: "${{ secrets.PATH_TO_REPO }}"
+            etcdCount: ${{ vars.ETCD_COUNT }}
+            controlPlaneCount: ${{ vars.CP_COUNT }}
+            workerCount: ${{ vars.WORKER_COUNT }}
+            windowsNodeCount: ${{ vars.WINDOWS_NODE_COUNT }}
           EOF
 
       - name: Export CATTLE_TEST_CONFIG
@@ -448,6 +459,13 @@ jobs:
               awsUser: "${{ secrets.AWS_USER }}"
               sshConnectionType: "${{ vars.SSH_CONNECTION_TYPE }}" 
               timeout: "${{ vars.TIMEOUT }}"
+              windowsAWSUser: "${{ secrets.AWS_WINDOWS_USER }}" 
+              windows2019AMI: "${{ secrets.WINDOWS_2019_AMI }}"
+              windows2022AMI: "${{ secrets.WINDOWS_2022_AMI }}"
+              windows2019Password: "${{ secrets.AWS_WINDOWS_2019_PASSWORD }}"
+              windows2022Password: "${{ secrets.AWS_WINDOWS_2022_PASSWORD }}"
+              windowsInstanceType: "${{ vars.AWS_WINDOWS_INSTANCE_TYPE }}"
+              windowsKeyName: "${{ secrets.WINDOWS_SSH_PRIVATE_KEY_NAME }}"
               ipAddressType: "${{ vars.IP_ADDRESS_TYPE }}"
               loadBalancerType: "${{ vars.LOAD_BALANCER_TYPE }}"
               targetType: "${{ vars.TARGET_TYPE }}"
@@ -476,6 +494,10 @@ jobs:
               ecrURI: "${{ secrets.ECR_URI }}"
           terratest:
             pathToRepo: "${{ secrets.PATH_TO_REPO }}"
+            etcdCount: ${{ vars.ETCD_COUNT }}
+            controlPlaneCount: ${{ vars.CP_COUNT }}
+            workerCount: ${{ vars.WORKER_COUNT }}
+            windowsNodeCount: ${{ vars.WINDOWS_NODE_COUNT }}
           EOF
 
       - name: Export CATTLE_TEST_CONFIG
@@ -713,6 +735,13 @@ jobs:
               awsUser: "${{ secrets.AWS_USER }}"
               sshConnectionType: "${{ vars.SSH_CONNECTION_TYPE }}" 
               timeout: "${{ vars.TIMEOUT }}"
+              windowsAWSUser: "${{ secrets.AWS_WINDOWS_USER }}" 
+              windows2019AMI: "${{ secrets.WINDOWS_2019_AMI }}"
+              windows2022AMI: "${{ secrets.WINDOWS_2022_AMI }}"
+              windows2019Password: "${{ secrets.AWS_WINDOWS_2019_PASSWORD }}"
+              windows2022Password: "${{ secrets.AWS_WINDOWS_2022_PASSWORD }}"
+              windowsInstanceType: "${{ vars.AWS_WINDOWS_INSTANCE_TYPE }}"
+              windowsKeyName: "${{ secrets.WINDOWS_SSH_PRIVATE_KEY_NAME }}"
               ipAddressType: "${{ vars.IP_ADDRESS_TYPE }}"
               loadBalancerType: "${{ vars.LOAD_BALANCER_TYPE }}"
               targetType: "${{ vars.TARGET_TYPE }}"
@@ -742,6 +771,10 @@ jobs:
               ecrURI: "${{ secrets.ECR_URI }}"
           terratest:
             pathToRepo: "${{ secrets.PATH_TO_REPO }}"
+            etcdCount: ${{ vars.ETCD_COUNT }}
+            controlPlaneCount: ${{ vars.CP_COUNT }}
+            workerCount: ${{ vars.WORKER_COUNT }}
+            windowsNodeCount: ${{ vars.WINDOWS_NODE_COUNT }}
           EOF
 
       - name: Export CATTLE_TEST_CONFIG
