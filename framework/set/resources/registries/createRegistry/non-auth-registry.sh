@@ -193,7 +193,9 @@ verify_images() {
                 echo "${IMAGE} exists"
             else
                 echo "${IMAGE} is missing, fixing..."
-                crane copy "docker.io/${IMAGE}" "${HOST}/${IMAGE}" --insecure &
+                sudo docker pull ${IMAGE}
+                sudo docker tag ${IMAGE} ${TARGET_IMAGE}
+                sudo docker push ${TARGET_IMAGE}
                 echo "${IMAGE} pushed successfully."
             fi
         } &

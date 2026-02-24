@@ -4,19 +4,10 @@
   suite: Go Automation/TFP/Airgap
   cases:
   - description: Provisions downstream RKE2 node driver cluster
-    preconditions: null
-    postconditions: null
     title: Airgap_RKE2
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 node driver cluster
@@ -37,22 +28,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream RKE2 Windows 2019 custom cluster
-    preconditions: null
-    postconditions: null
     title: Airgap_RKE2_Windows_2019
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2019 custom cluster
@@ -73,22 +53,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream RKE2 Windows 2022 custom cluster
-    preconditions: null
-    postconditions: null
     title: Airgap_RKE2_Windows_2022
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2022 custom cluster
@@ -105,62 +74,14 @@
       steps: []
     tags: []
     params: {}
-    parameters:
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: Scheduled Testing
-        values:
-        - v2.11.3
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: 'Upgraded From Rancher Community: v2.12.3 to Rancher Community'
-        values:
-        - v2.11.3
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: CNI
-        values:
-        - calico
-    - parametergroup: null
-      parametershared: null
-      parametersingle: null
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: Windows2022AMI
-        values:
-        - ami-0e676645ef0eaf221
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: K8sVersion
-        values:
-        - v1.33.5+rke2r1
-    - parametergroup: null
-      parametershared: null
-      parametersingle: null
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream K3S node driver cluster
-    preconditions: null
-    postconditions: null
     title: Airgap_K3S
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream K3S node driver cluster
@@ -177,59 +98,14 @@
       steps: []
     tags: []
     params: {}
-    parameters:
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: Scheduled Testing
-        values:
-        - v2.11.3
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: 'Upgraded From Rancher Community: v2.12.3 to Rancher Community'
-        values:
-        - v2.11.3
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: CNI
-        values:
-        - calico
-    - parametergroup: null
-      parametershared: null
-      parametersingle: null
-    - parametergroup: null
-      parametershared: null
-      parametersingle: null
-    - parametergroup: null
-      parametershared: null
-      parametersingle:
-        title: K8sVersion
-        values:
-        - v1.33.5+k3s1
-    - parametergroup: null
-      parametershared: null
-      parametersingle: null
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream RKE2 node driver cluster prior to Rancher upgrade
-    preconditions: null
-    postconditions: null
     title: Airgap_Pre_Rancher_Upgrade_RKE2
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 node driver cluster
@@ -250,23 +126,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
-  - description: Provisions downstream RKE2 Windows 2019 custom cluster prior to Rancher
-      upgrade
-    preconditions: null
-    postconditions: null
+  - description: Provisions downstream RKE2 Windows 2019 custom cluster prior to Rancher upgrade
     title: Airgap_Pre_Rancher_Upgrade_RKE2_Windows_2019
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2019 custom cluster
@@ -287,23 +151,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
-  - description: Provisions downstream RKE2 Windows 2022 custom cluster prior to Rancher
-      upgrade
-    preconditions: null
-    postconditions: null
+  - description: Provisions downstream RKE2 Windows 2022 custom cluster prior to Rancher upgrade
     title: Airgap_Pre_Rancher_Upgrade_RKE2_Windows_2022
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2022 custom cluster
@@ -324,22 +176,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream K3S node driver cluster prior to Rancher upgrade
-    preconditions: null
-    postconditions: null
     title: Airgap_Pre_Rancher_Upgrade_K3S
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream K3S node driver cluster
@@ -360,22 +201,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream RKE2 node driver cluster post Rancher upgrade
-    preconditions: null
-    postconditions: null
     title: Airgap_Post_Rancher_Upgrade_RKE2
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 node driver cluster
@@ -396,23 +226,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
-  - description: Provisions downstream RKE2 Windows 2019 custom cluster post Rancher
-      upgrade
-    preconditions: null
-    postconditions: null
+  - description: Provisions downstream RKE2 Windows 2019 custom cluster post Rancher upgrade
     title: Airgap_Post_Rancher_Upgrade_RKE2_Windows_2019
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2019 custom cluster
@@ -433,23 +251,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
-  - description: Provisions downstream RKE2 Windows 2022 custom cluster post Rancher
-      upgrade
-    preconditions: null
-    postconditions: null
+  - description: Provisions downstream RKE2 Windows 2022 custom cluster post Rancher upgrade
     title: Airgap_Post_Rancher_Upgrade_RKE2_Windows_2022
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream RKE2 Windows 2022 custom cluster
@@ -470,22 +276,11 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
   - description: Provisions downstream K3S node driver cluster post Rancher upgrade
-    preconditions: null
-    postconditions: null
     title: Airgap_Post_Rancher_Upgrade_K3S
-    severity: null
     priority: 4
-    behavior: null
     type: 8
-    layer: null
-    isflaky: null
-    suiteid: null
-    milestoneid: null
     automation: 2
-    status: null
     attachments: []
     steps:
     - action: Provision downstream K3S node driver cluster
@@ -506,5 +301,3 @@
     customfield:
       "14": Validation
       "18": Hostbusters
-    createdat: null
-    updatedat: null
