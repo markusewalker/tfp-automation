@@ -36,4 +36,25 @@ dockerDaemonFunction=$(declare -f setupDockerDaemon)
 runSSH "${NODE_PRIVATE_IP}" "${dockerDaemonFunction}; setupDockerDaemon"
 
 runSSH "${NODE_PRIVATE_IP}" "sudo systemctl daemon-reload && sudo systemctl restart docker"
-runSSH "${NODE_PRIVATE_IP}" "${REGISTRATION_COMMAND}"
+
+MAX_RETRIES=5
+RETRY_DELAY=15
+ATTEMPT=1
+SUCCESS=0
+
+while [ $ATTEMPT -le $MAX_RETRIES ]; do
+  runSSH "${NODE_PRIVATE_IP}" "${REGISTRATION_COMMAND}"
+  EXIT_CODE=$?
+
+  if [ $EXIT_CODE -eq 0 ]; then
+    SUCCESS=1
+    break
+  else
+    sleep $RETRY_DELAY
+    ATTEMPT=$((ATTEMPT+1))
+  fi
+done
+
+if [ $SUCCESS -ne 1 ]; then
+  exit 1
+fi
