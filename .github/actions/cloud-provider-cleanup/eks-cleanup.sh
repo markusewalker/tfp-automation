@@ -28,30 +28,6 @@ else
   echo "No matching Route53 records found."
 fi
 
-CLUSTER_NAMES=$(aws eks list-clusters --query "clusters[?starts_with(@, \`${PREFIX}\`)]" --output text)
-
-if [ -n "$CLUSTER_NAMES" ]; then
-  for cluster in $CLUSTER_NAMES; do
-    echo "Deleting cluster $cluster..."
-    eksctl utils write-kubeconfig --cluster "$cluster" --region "$AWS_REGION" > /dev/null
-    eksctl delete cluster --name "$cluster" --region "$AWS_REGION" --force --disable-nodegroup-eviction > /dev/null
-  done
-else
-  echo "No matching clusters found."
-fi
-
-INSTANCE_IDS=$(aws ec2 describe-instances \
-  --filters "Name=tag:Name,Values=${PREFIX}*" \
-  --query "Reservations[].Instances[?State.Name!='terminated'].InstanceId" \
-  --output text)
-
-if [ -n "$INSTANCE_IDS" ]; then
-  echo "Deleting EC2 instances..."
-  aws ec2 terminate-instances --instance-ids $INSTANCE_IDS > /dev/null
-else
-  echo "No matching instances found"
-fi
-
 VPC_IDS=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=eksctl-${PREFIX}*" --query "Vpcs[?State=='available'].VpcId" --output text)
 
 if [ -n "$VPC_IDS" ]; then
@@ -78,6 +54,52 @@ if [ -n "$VPC_IDS" ]; then
       echo "No target groups found."
     fi
   done
+fi
+
+CLUSTER_NAMES=$(aws eks list-clusters --query "clusters[?starts_with(@, \`${PREFIX}\`)]" --output text)
+
+if [ -n "$CLUSTER_NAMES" ]; then
+  for cluster in $CLUSTER_NAMES; do
+    echo "Deleting cluster $cluster..."
+    eksctl utils write-kubeconfig --cluster "$cluster" --region "$AWS_REGION" > /dev/null
+    eksctl delete nodegroup --cluster "$cluster" --region "$AWS_REGION" --name "${PREFIX}-ng" --wait --drain=false > /dev/null
+
+    while true; do
+      COUNT=$(aws eks list-nodegroups --cluster-name "$cluster" --region "$AWS_REGION" --query "length(nodegroups)" --output text)
+
+      if [ "$COUNT" = "0" ]; then
+        break
+      fi
+
+      sleep 15
+    done
+
+    eksctl delete cluster --name "$cluster" --region "$AWS_REGION" --wait --force > /dev/null || true
+
+    aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE DELETE_FAILED DELETE_IN_PROGRESS \
+                                   --query "StackSummaries[?contains(StackName, '${PREFIX}')].StackName" \
+                                   --output text | while read -r stack; do
+
+                                   echo "Deleting stack $stack"
+                                   aws cloudformation update-termination-protection --stack-name "$stack" --no-enable-termination-protection > /dev/null
+                                   aws cloudformation delete-stack --stack-name "$stack" > /dev/null
+    done                                             
+
+  done
+else
+  echo "No matching clusters found."
+fi
+
+INSTANCE_IDS=$(aws ec2 describe-instances \
+  --filters "Name=tag:Name,Values=${PREFIX}*" \
+  --query "Reservations[].Instances[?State.Name!='terminated'].InstanceId" \
+  --output text)
+
+if [ -n "$INSTANCE_IDS" ]; then
+  echo "Deleting EC2 instances..."
+  aws ec2 terminate-instances --instance-ids $INSTANCE_IDS > /dev/null
+else
+  echo "No matching instances found"
 fi
 
 echo "Cleanup completed!"
