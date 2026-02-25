@@ -9,7 +9,6 @@ import (
 
 // SetDataDirectories is a function that will set the data directories configurations in the main.tf file.
 func SetDataDirectories(terraformConfig *config.TerraformConfig, rkeConfigBlockBody *hclwrite.Body) error {
-
 	dataDirectoriesBlock := rkeConfigBlockBody.AppendNewBlock(clusters.DataDirectories, nil)
 	dataDirectoriesBlockBody := dataDirectoriesBlock.Body()
 

@@ -32,10 +32,11 @@ const (
 	DefaultClusterRoleForProjectMembers = "default_cluster_role_for_project_members"
 	RancherBaseline                     = "rancher-baseline"
 
-	DataDirectories = "data_directories"
-	SystemAgent     = "system_agent"
-	Provisioning    = "provisioning"
-	K8sDistro       = "k8s_distro"
+	DataDirectories   = "data_directories"
+	LocalAuthEndpoint = "local_auth_endpoint"
+	SystemAgent       = "system_agent"
+	Provisioning      = "provisioning"
+	K8sDistro         = "k8s_distro"
 
 	Locals                          = "locals"
 	ResourcePrefix                  = "resource_prefix"

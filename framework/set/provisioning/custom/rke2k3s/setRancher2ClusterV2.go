@@ -28,6 +28,13 @@ func SetRancher2ClusterV2(rootBody *hclwrite.Body, terraformConfig *config.Terra
 		v2.SetProxyConfig(rancher2ClusterV2BlockBody, terraformConfig)
 	}
 
+	if terraformConfig.LocalAuthEndpoint {
+		err := v2.SetLocalAuthEndpoint(terraformConfig, rancher2ClusterV2BlockBody)
+		if err != nil {
+			return err
+		}
+	}
+
 	rkeConfigBlock := rancher2ClusterV2BlockBody.AppendNewBlock(clusters.RkeConfig, nil)
 	rkeConfigBlockBody := rkeConfigBlock.Body()
 

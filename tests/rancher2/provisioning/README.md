@@ -42,6 +42,7 @@ terraform:
   enableNetworkPolicy: false
   defaultClusterRoleForProjectMembers: "user"
   downstreamClusterProvider: ""       # ec2_rke1_custom, ec2_rke2_custom, ec2_k3s_custom, vsphere_rke1_custom, vsphere_rke2_custom, vsphere_k3s_custom
+  localAuthEndpoint: false      # OPTIONAL - false by default
   module:                       # ec2_rke1_custom, ec2_rke2_custom, ec2_k3s_custom, vsphere_rke1_custom, vsphere_rke2_custom, vsphere_k3s_custom
   privateKeyPath: ""
   provider: ""                  # aws or vsphere
@@ -316,7 +317,6 @@ In addition, when running locally, you will need to ensure that you have `export
 See the below examples on how to run the tests:
 
 ### Node Driver
-
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=validation -v -run "TestTfpProvisionTestSuite/TestTfpProvision$"` \
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=dynamic -v -run "TestTfpProvisionTestSuite/TestTfpProvisionDynamicInput$"`
 
@@ -325,13 +325,17 @@ See the below examples on how to run the tests:
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=dynamic -v -run "TestTfpProvisionCustomTestSuite/TestTfpProvisionCustomDynamicInput$"`
 
 ### Imported
-
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=validation -v -run "TestTfpUpgradeImportedClusterTestSuite/TestTfpUpgradeImportedCluster$"` \
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=dynamic -v -run "TestTfpUpgradeImportedClusterTestSuite/TestTfpUpgradeImportedClusterDynamicInput$"`
 
 ### Hosted
-
 `gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=validation -v -run "TestTfpProvisionHostedTestSuite/TestTfpProvisionHosted$"`
+
+### ACE
+`gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=validation -v -run "TestProvisionACETestSuite/TestTfpProvisionACE$"`
+
+### Data Directories
+`gotestsum --format standard-verbose --packages=github.com/rancher/tfp-automation/tests/rancher2/provisioning --junitfile results.xml --jsonfile results.json -- -timeout=60m -tags=validation -v -run "TestProvisionDataDirectoryTestSuite/TestTfpProvisionDataDirectory$"`
 
 If the specified test passes immediately without warning, try adding the -count=1 flag to get around this issue. This will avoid previous results from interfering with the new test run.
 

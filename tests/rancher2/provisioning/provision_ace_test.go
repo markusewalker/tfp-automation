@@ -4,7 +4,6 @@ package provisioning
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -21,7 +20,7 @@ import (
 	"github.com/rancher/tfp-automation/defaults/keypath"
 	"github.com/rancher/tfp-automation/defaults/stevetypes"
 	"github.com/rancher/tfp-automation/framework"
-	cleanup "github.com/rancher/tfp-automation/framework/cleanup"
+	"github.com/rancher/tfp-automation/framework/cleanup"
 	"github.com/rancher/tfp-automation/framework/set/resources/rancher2"
 	tfpQase "github.com/rancher/tfp-automation/pipeline/qase"
 	"github.com/rancher/tfp-automation/pipeline/qase/results"
@@ -31,7 +30,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CustomDataDirectoryTestSuite struct {
+type ProvisionACETestSuite struct {
 	suite.Suite
 	client             *rancher.Client
 	standardUserClient *rancher.Client
@@ -43,7 +42,7 @@ type CustomDataDirectoryTestSuite struct {
 	terraformOptions   *terraform.Options
 }
 
-func (p *CustomDataDirectoryTestSuite) SetupSuite() {
+func (p *ProvisionACETestSuite) SetupSuite() {
 	testSession := session.NewSession()
 	p.session = testSession
 
@@ -60,14 +59,12 @@ func (p *CustomDataDirectoryTestSuite) SetupSuite() {
 	p.terraformOptions = terraformOptions
 }
 
-func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
-	if p.terraformConfig.Standalone != nil && strings.Contains(p.terraformConfig.Standalone.RancherTagVersion, "2.11") {
-		p.T().Skip("Skipping due to custom data directory not being supported in Rancher 2.11")
-	}
-
+func (p *ProvisionACETestSuite) TestTfpProvisionACE() {
 	var err error
 	var testUser, testPassword string
 	var clusterIDs []string
+
+	customClusterNames := []string{}
 
 	p.standardUserClient, testUser, testPassword, err = standarduser.CreateStandardUser(p.client)
 	require.NoError(p.T(), err)
@@ -75,13 +72,18 @@ func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
 	nodeRolesDedicated := []config.Nodepool{config.EtcdNodePool, config.ControlPlaneNodePool, config.WorkerNodePool}
 	rke2Module, _, _, k3sModule := provisioning.DownstreamClusterModules(p.terraformConfig)
 
+	localAuthEndpoint := config.TerraformConfig{
+		LocalAuthEndpoint: true,
+	}
+
 	tests := []struct {
-		name      string
-		module    string
-		nodeRoles []config.Nodepool
+		name         string
+		module       string
+		nodeRoles    []config.Nodepool
+		authEndpoint config.TerraformConfig
 	}{
-		{"RKE2_Custom_Data_Directory", rke2Module, nodeRolesDedicated},
-		{"K3S_Custom_Data_Directory", k3sModule, nodeRolesDedicated},
+		{"RKE2_ACE", rke2Module, nodeRolesDedicated, localAuthEndpoint},
+		{"K3S_ACE", k3sModule, nodeRolesDedicated, localAuthEndpoint},
 	}
 
 	for _, tt := range tests {
@@ -92,6 +94,9 @@ func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
 		require.NoError(p.T(), err)
 
 		_, err = operations.ReplaceValue([]string{"terratest", "nodepools"}, tt.nodeRoles, configMap[0])
+		require.NoError(p.T(), err)
+
+		_, err = operations.ReplaceValue([]string{"terraform", "localAuthEndpoint"}, tt.authEndpoint.LocalAuthEndpoint, configMap[0])
 		require.NoError(p.T(), err)
 
 		_, err = operations.ReplaceValue([]string{"terraform", "module"}, tt.module, configMap[0])
@@ -108,7 +113,7 @@ func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
 			adminClient, err := provisioning.FetchAdminClient(p.T(), p.client)
 			require.NoError(p.T(), err)
 
-			clusterIDs, _ := provisioning.Provision(p.T(), p.client, p.standardUserClient, rancher, terraform, terratest, testUser, testPassword, p.terraformOptions, configMap, newFile, rootBody, file, false, false, false, clusterIDs, nil)
+			clusterIDs, _ := provisioning.Provision(p.T(), p.client, p.standardUserClient, rancher, terraform, terratest, testUser, testPassword, p.terraformOptions, configMap, newFile, rootBody, file, false, false, true, clusterIDs, customClusterNames)
 			provisioning.VerifyClustersState(p.T(), adminClient, clusterIDs)
 			provisioning.VerifyServiceAccountTokenSecret(p.T(), adminClient, clusterIDs)
 
@@ -118,7 +123,7 @@ func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
 			err = pods.VerifyClusterPods(p.client, cluster)
 			require.NoError(p.T(), err)
 
-			verify.VerifyDataDirectories(p.T(), adminClient, cluster)
+			verify.VerifyACE(p.T(), adminClient, cluster)
 		})
 
 		params := tfpQase.GetProvisioningSchemaParams(configMap[0])
@@ -133,6 +138,6 @@ func (p *CustomDataDirectoryTestSuite) TestTfpCustomDataDirectory() {
 	}
 }
 
-func TestTfpCustomDataDirectoryTestSuite(t *testing.T) {
-	suite.Run(t, new(CustomDataDirectoryTestSuite))
+func TestProvisionACETestSuite(t *testing.T) {
+	suite.Run(t, new(ProvisionACETestSuite))
 }
