@@ -44,6 +44,7 @@ func CreateWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig *config.
 
 	configBlockBody.SetAttributeValue(aws.InstanceType, cty.StringVal(terraformConfig.AWSConfig.WindowsInstanceType))
 	configBlockBody.SetAttributeValue(aws.SubnetId, cty.StringVal(terraformConfig.AWSConfig.AWSSubnetID))
+
 	securityGroups := format.ListOfStrings(terraformConfig.AWSConfig.AWSSecurityGroups)
 	configBlockBody.SetAttributeRaw(aws.VpcSecurityGroupIds, securityGroups)
 	configBlockBody.SetAttributeValue(aws.KeyName, cty.StringVal(terraformConfig.AWSConfig.WindowsKeyName))
@@ -77,6 +78,7 @@ func CreateWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig *config.
 
 	connectionBlockBody.SetAttributeValue(general.Type, cty.StringVal(general.WinRM))
 	connectionBlockBody.SetAttributeValue(general.User, cty.StringVal(terraformConfig.AWSConfig.WindowsAWSUser))
+
 	if strings.Contains(terraformConfig.Module, clustertypes.WINDOWS) && strings.Contains(terraformConfig.Module, "2019") {
 		connectionBlockBody.SetAttributeValue(general.Password, cty.StringVal(terraformConfig.AWSConfig.Windows2019Password))
 	} else if strings.Contains(terraformConfig.Module, clustertypes.WINDOWS) && strings.Contains(terraformConfig.Module, "2022") {
@@ -85,6 +87,7 @@ func CreateWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig *config.
 
 	connectionBlockBody.SetAttributeValue(general.Insecure, cty.BoolVal(true))
 	connectionBlockBody.SetAttributeValue(general.UseNTLM, cty.BoolVal(true))
+
 	hostExpression := general.Self + "." + general.PublicIp
 	host := hclwrite.Tokens{
 		{Type: hclsyntax.TokenIdent, Bytes: []byte(hostExpression)},
@@ -94,13 +97,6 @@ func CreateWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig *config.
 
 	connectionBlockBody.SetAttributeValue(aws.Timeout, cty.StringVal(terraformConfig.AWSConfig.Timeout))
 	configBlockBody.AppendNewline()
-
-	provisionerBlock := configBlockBody.AppendNewBlock(general.Provisioner, []string{general.RemoteExec})
-	provisionerBlockBody := provisionerBlock.Body()
-
-	provisionerBlockBody.SetAttributeValue(general.Inline, cty.ListVal([]cty.Value{
-		cty.StringVal("echo Connected!!!"),
-	}))
 
 	if terraformConfig.Module == modules.ImportEC2RKE2Windows2019 || terraformConfig.Module == modules.ImportEC2RKE2Windows2022 {
 		serverTwoName := terraformConfig.ResourcePrefix + `_server2`
@@ -131,6 +127,7 @@ func CreateAirgappedWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig
 
 	configBlockBody.SetAttributeValue(aws.InstanceType, cty.StringVal(terraformConfig.AWSConfig.WindowsInstanceType))
 	configBlockBody.SetAttributeValue(aws.SubnetId, cty.StringVal(terraformConfig.AWSConfig.AWSSubnetID))
+
 	securityGroups := format.ListOfStrings(terraformConfig.AWSConfig.AWSSecurityGroups)
 	configBlockBody.SetAttributeRaw(aws.VpcSecurityGroupIds, securityGroups)
 	configBlockBody.SetAttributeValue(aws.KeyName, cty.StringVal(terraformConfig.AWSConfig.WindowsKeyName))
@@ -163,6 +160,7 @@ func CreateAirgappedWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig
 
 	connectionBlockBody.SetAttributeValue(general.Type, cty.StringVal(general.WinRM))
 	connectionBlockBody.SetAttributeValue(general.User, cty.StringVal(terraformConfig.AWSConfig.WindowsAWSUser))
+
 	if strings.Contains(terraformConfig.Module, modules.AirgapRKE2Windows2019) {
 		connectionBlockBody.SetAttributeValue(general.Password, cty.StringVal(terraformConfig.AWSConfig.Windows2019Password))
 	} else if strings.Contains(terraformConfig.Module, modules.AirgapRKE2Windows2022) {
@@ -178,6 +176,5 @@ func CreateAirgappedWindowsAWSInstances(rootBody *hclwrite.Body, terraformConfig
 	}
 
 	connectionBlockBody.SetAttributeRaw(general.Host, host)
-
 	connectionBlockBody.SetAttributeValue(aws.Timeout, cty.StringVal(terraformConfig.AWSConfig.Timeout))
 }

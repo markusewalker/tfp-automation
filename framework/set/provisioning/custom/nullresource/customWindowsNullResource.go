@@ -60,5 +60,6 @@ func CustomWindowsNullResource(rootBody *hclwrite.Body, terraformConfig *config.
 	}
 
 	provisionerBlockBody.SetAttributeRaw(general.Inline, regCommand)
+
 	return nil
 }
