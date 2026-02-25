@@ -125,6 +125,13 @@ func SetRKE2K3s(terraformConfig *config.TerraformConfig, terratestConfig *config
 		}
 	}
 
+	if terraformConfig.LocalAuthEndpoint {
+		err = SetLocalAuthEndpoint(terraformConfig, clusterBlockBody)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	rkeConfigBlockBody, err := setRKEConfig(clusterBlockBody, terraformConfig)
 	if err != nil {
 		return nil, nil, err
