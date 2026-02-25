@@ -126,6 +126,7 @@ func (s *TfpSanityProvisioningTestSuite) TestTfpProvisioningSanity() {
 				clusterIDs, customClusterNames = provisioning.Provision(s.T(), s.client, s.standardUserClient, rancher, terraform, terratest, testUser, testPassword, s.terraformOptions, configMap, newFile, rootBody, file, true, true, true, clusterIDs, customClusterNames)
 				provisioning.VerifyClustersState(s.T(), s.client, clusterIDs)
 				provisioning.VerifyServiceAccountTokenSecret(s.T(), s.client, clusterIDs)
+
 				err = pods.VerifyClusterPods(s.client, cluster)
 				require.NoError(s.T(), err)
 			}
