@@ -115,7 +115,7 @@ rancher:
 terraform:
   cni: ""
   defaultClusterRoleForProjectMembers: "true"
-  downstreamClusterProvider: ""           # ec2_rke1_import, ec2_rke2_import, ec2_k3s_import, vsphere_rke1_import, vsphere_rke2_import, vsphere_k3s_import
+  downstreamClusterProvider: ""       # REQUIRED - can be aws, azure, linode, vsphere
   enableNetworkPolicy: false
   mixedArchitecture:                              # OPTIONAL - set to true if you want mixed architecture
   privateKeyPath: ""

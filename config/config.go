@@ -182,6 +182,7 @@ type TerraformConfig struct {
 	GithubConfig                        authproviders.GithubConfig   `json:"githubConfig,omitempty" yaml:"githubConfig,omitempty"`
 	OktaConfig                          authproviders.OktaConfig     `json:"oktaConfig,omitempty" yaml:"oktaConfig,omitempty"`
 	OpenLDAPConfig                      authproviders.OpenLDAPConfig `json:"openLDAPConfig,omitempty" yaml:"openLDAPConfig,omitempty"`
+	AirgapBastion                       string                       `json:"airgapBastion,omitempty" yaml:"airgapBastion,omitempty"`
 	AuthProvider                        string                       `json:"authProvider,omitempty" yaml:"authProvider,omitempty"`
 	ResourcePrefix                      string                       `json:"resourcePrefix,omitempty" yaml:"resourcePrefix,omitempty"`
 	CNI                                 string                       `json:"cni,omitempty" yaml:"cni,omitempty"`

@@ -52,7 +52,6 @@ jobs:
       HOSTNAME_PREFIX: "agu-214"
       REPORTING_ENABLED: >-
         ${{
-          github.event_name == 'schedule' ||
           github.event_name == 'workflow_call' ||
           github.actor == 'github-actions[bot]' ||
           (github.event_name == 'workflow_dispatch' && github.event.inputs.reporting == 'true' )
@@ -326,7 +325,6 @@ jobs:
       HOSTNAME_PREFIX: "agu-213"
       REPORTING_ENABLED: >-
         ${{
-          github.event_name == 'schedule' ||
           github.event_name == 'workflow_call' ||
           github.actor == 'github-actions[bot]' ||
           (github.event_name == 'workflow_dispatch' && github.event.inputs.reporting == 'true' )
@@ -600,7 +598,6 @@ jobs:
       HOSTNAME_PREFIX: "agu-212"
       REPORTING_ENABLED: >-
         ${{
-          github.event_name == 'schedule' ||
           github.event_name == 'workflow_call' ||
           github.actor == 'github-actions[bot]' ||
           (github.event_name == 'workflow_dispatch' && github.event.inputs.reporting == 'true' )

@@ -1,0 +1,153 @@
+//go:build validation || recurring
+
+package airgap
+
+import (
+	"os"
+	"testing"
+
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/rancher/shepherd/clients/rancher"
+	"github.com/rancher/shepherd/extensions/defaults/namespaces"
+	shepherdConfig "github.com/rancher/shepherd/pkg/config"
+	"github.com/rancher/shepherd/pkg/config/operations"
+	"github.com/rancher/shepherd/pkg/session"
+	"github.com/rancher/tests/actions/qase"
+	"github.com/rancher/tests/actions/workloads/pods"
+	"github.com/rancher/tests/validation/provisioning/resources/standarduser"
+	"github.com/rancher/tfp-automation/config"
+	"github.com/rancher/tfp-automation/defaults/keypath"
+	"github.com/rancher/tfp-automation/defaults/modules"
+	"github.com/rancher/tfp-automation/defaults/stevetypes"
+	"github.com/rancher/tfp-automation/framework"
+	"github.com/rancher/tfp-automation/framework/cleanup"
+	"github.com/rancher/tfp-automation/framework/set/resources/rancher2"
+	tfpQase "github.com/rancher/tfp-automation/pipeline/qase"
+	"github.com/rancher/tfp-automation/pipeline/qase/results"
+	"github.com/rancher/tfp-automation/tests/extensions/provisioning"
+	"github.com/rancher/tfp-automation/tests/extensions/ssh"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+)
+
+type AirgapACETestSuite struct {
+	suite.Suite
+	client             *rancher.Client
+	standardUserClient *rancher.Client
+	session            *session.Session
+	cattleConfig       map[string]any
+	rancherConfig      *rancher.Config
+	terraformConfig    *config.TerraformConfig
+	terratestConfig    *config.TerratestConfig
+	standaloneConfig   *config.Standalone
+	terraformOptions   *terraform.Options
+	tunnel             *ssh.BastionSSHTunnel
+}
+
+func (a *AirgapACETestSuite) SetupSuite() {
+	testSession := session.NewSession()
+	a.session = testSession
+
+	a.cattleConfig = shepherdConfig.LoadConfigFromFile(os.Getenv(shepherdConfig.ConfigEnvironmentKey))
+	a.rancherConfig, a.terraformConfig, a.terratestConfig, a.standaloneConfig = config.LoadTFPConfigs(a.cattleConfig)
+
+	sshKey, err := os.ReadFile(a.terraformConfig.PrivateKeyPath)
+	require.NoError(a.T(), err)
+
+	a.tunnel, err = ssh.StartBastionSSHTunnel(a.terraformConfig.AirgapBastion, a.standaloneConfig.OSUser, sshKey, "8443", a.standaloneConfig.RancherHostname, "443")
+	require.NoError(a.T(), err)
+
+	client, err := rancher.NewClient("", testSession)
+	require.NoError(a.T(), err)
+
+	a.client = client
+
+	_, keyPath := rancher2.SetKeyPath(keypath.RancherKeyPath, a.terratestConfig.PathToRepo, "")
+	terraformOptions := framework.Setup(a.T(), a.terraformConfig, a.terratestConfig, keyPath)
+	a.terraformOptions = terraformOptions
+}
+
+func (a *AirgapACETestSuite) TestTfpAirgapACE() {
+	var err error
+	var testUser, testPassword string
+	var clusterIDs []string
+
+	customClusterNames := []string{}
+
+	a.standardUserClient, testUser, testPassword, err = standarduser.CreateStandardUser(a.client)
+	require.NoError(a.T(), err)
+
+	localAuthEndpoint := config.TerraformConfig{
+		LocalAuthEndpoint: true,
+	}
+
+	tests := []struct {
+		name         string
+		module       string
+		authEndpoint config.TerraformConfig
+	}{
+		{"RKE2_Airgap_ACE", modules.AirgapRKE2, localAuthEndpoint},
+		{"K3S_Airgap_ACE", modules.AirgapK3S, localAuthEndpoint},
+	}
+
+	for _, tt := range tests {
+		newFile, rootBody, file := rancher2.InitializeMainTF(a.terratestConfig)
+		defer file.Close()
+
+		configMap, err := provisioning.UniquifyTerraform([]map[string]any{a.cattleConfig})
+		require.NoError(a.T(), err)
+
+		_, err = operations.ReplaceValue([]string{"terraform", "localAuthEndpoint"}, tt.authEndpoint.LocalAuthEndpoint, configMap[0])
+		require.NoError(a.T(), err)
+
+		_, err = operations.ReplaceValue([]string{"terraform", "module"}, tt.module, configMap[0])
+		require.NoError(a.T(), err)
+
+		_, err = operations.ReplaceValue([]string{"terraform", "privateRegistries", "systemDefaultRegistry"}, a.terraformConfig.PrivateRegistries.SystemDefaultRegistry, configMap[0])
+		require.NoError(a.T(), err)
+
+		_, err = operations.ReplaceValue([]string{"terraform", "privateRegistries", "url"}, a.terraformConfig.PrivateRegistries.URL, configMap[0])
+		require.NoError(a.T(), err)
+
+		provisioning.GetK8sVersion(a.T(), a.client, a.terratestConfig, a.terraformConfig, configMap)
+
+		rancher, terraform, terratest, _ := config.LoadTFPConfigs(configMap[0])
+
+		a.Run((tt.name), func() {
+			_, keyPath := rancher2.SetKeyPath(keypath.RancherKeyPath, a.terratestConfig.PathToRepo, "")
+			defer cleanup.Cleanup(a.T(), a.terraformOptions, keyPath)
+
+			adminClient, err := provisioning.FetchAdminClient(a.T(), a.client)
+			require.NoError(a.T(), err)
+
+			clusterIDs, _ := provisioning.Provision(a.T(), a.client, a.standardUserClient, rancher, terraform, terratest, testUser, testPassword, a.terraformOptions, configMap, newFile, rootBody, file, false, false, true, clusterIDs, customClusterNames)
+			provisioning.VerifyClustersState(a.T(), adminClient, clusterIDs)
+			provisioning.VerifyServiceAccountTokenSecret(a.T(), adminClient, clusterIDs)
+
+			cluster, err := a.client.Steve.SteveType(stevetypes.Provisioning).ByID(namespaces.FleetDefault + "/" + terraform.ResourcePrefix)
+			require.NoError(a.T(), err)
+
+			err = pods.VerifyClusterPods(a.client, cluster)
+			require.NoError(a.T(), err)
+
+			provisioning.VerifyACEAirgap(a.T(), adminClient, cluster)
+		})
+
+		params := tfpQase.GetProvisioningSchemaParams(configMap[0])
+		err = qase.UpdateSchemaParameters(tt.name, params)
+		if err != nil {
+			logrus.Warningf("Failed to upload schema parameters %s", err)
+		}
+	}
+
+	if a.terratestConfig.LocalQaseReporting {
+		results.ReportTest(a.terratestConfig)
+	}
+
+	a.tunnel.StopBastionSSHTunnel()
+}
+
+func TestAirgapACETestSuite(t *testing.T) {
+	suite.Run(t, new(AirgapACETestSuite))
+}
