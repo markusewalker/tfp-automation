@@ -9,9 +9,6 @@ inputs:
   package:
     description: "Package to test"
     required: true
-  test-suite:
-    description: "Suite to test"
-    required: true
   timeout:
     description: "Timeout"
     required: true

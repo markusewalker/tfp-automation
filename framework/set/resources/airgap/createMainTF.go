@@ -69,6 +69,11 @@ func CreateMainTF(t *testing.T, terraformOptions *terraform.Options, keyPath str
 	serverTwoPrivateIP := terraform.Output(t, terraformOptions, serverTwoPrivateIP)
 	serverThreePrivateIP := terraform.Output(t, terraformOptions, serverThreePrivateIP)
 
+	// Needed for setting up an airgap Rancher server that is planned to be used for recurring runs.
+	terraformConfig.AirgapBastion = bastionPublicDNS
+	terraformConfig.PrivateRegistries.SystemDefaultRegistry = registryPublicDNS
+	terraformConfig.PrivateRegistries.URL = registryPublicDNS
+
 	logrus.Infof("Creating registry...")
 	file = sanity.OpenFile(file, keyPath)
 	file, err = registry.CreateNonAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, registryPublicDNS, nonAuthRegistry)

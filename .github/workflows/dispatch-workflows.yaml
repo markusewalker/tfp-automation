@@ -23,6 +23,7 @@ jobs:
           - post-release-sanity-upgrade.yaml
           - proxy-test.yaml
           - proxy-upgrade-test.yaml
+          - rancher2-airgap-recurring-test.yaml
           - rancher2-recurring-test.yaml
           - registry-test.yaml
           - sanity-test.yaml

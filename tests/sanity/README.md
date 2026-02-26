@@ -35,7 +35,7 @@ rancher:
 terraform:
   cni: ""                                         # REQUIRED - fill with desired value
   defaultClusterRoleForProjectMembers: "true"     # REQUIRED - leave value as true
-  downstreamClusterProvider: "aws"
+  downstreamClusterProvider: ""                   # REQUIRED - can be aws, azure, linode, vsphere
   enableNetworkPolicy: false                      # REQUIRED - values are true or false -  can leave as false
   mixedArchitecture:                              # OPTIONAL - set to true if you want mixed architecture
   provider: "aws"

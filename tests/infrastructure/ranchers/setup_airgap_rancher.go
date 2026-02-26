@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	shepherdConfig "github.com/rancher/shepherd/pkg/config"
+	"github.com/rancher/shepherd/pkg/config/operations"
 	"github.com/rancher/shepherd/pkg/session"
 	"github.com/rancher/tests/actions/features"
+	infraConfig "github.com/rancher/tests/validation/recurring/infrastructure/config"
 	"github.com/rancher/tfp-automation/config"
 	"github.com/rancher/tfp-automation/defaults/keypath"
 	"github.com/rancher/tfp-automation/framework"
@@ -37,6 +39,18 @@ func CreateAirgapRancher(t *testing.T, provider string) error {
 		return err
 	}
 
+	_, err = operations.ReplaceValue([]string{"terraform", "airgapBastion"}, terraformConfig.AirgapBastion, cattleConfig)
+	require.NoError(t, err)
+
+	_, err = operations.ReplaceValue([]string{"terraform", "privateRegistries", "systemDefaultRegistry"}, terraformConfig.PrivateRegistries.SystemDefaultRegistry, cattleConfig)
+	require.NoError(t, err)
+
+	_, err = operations.ReplaceValue([]string{"terraform", "privateRegistries", "url"}, terraformConfig.PrivateRegistries.URL, cattleConfig)
+	require.NoError(t, err)
+
+	rancherConfig, terraformConfig, terratestConfig, _ = config.LoadTFPConfigs(cattleConfig)
+	infraConfig.WriteConfigToFile(os.Getenv(configEnvironmentKey), cattleConfig)
+
 	sshKey, err := os.ReadFile(terraformConfig.PrivateKeyPath)
 	require.NoError(t, err)
 
@@ -47,6 +61,12 @@ func CreateAirgapRancher(t *testing.T, provider string) error {
 
 	client, err := PostRancherSetup(t, terraformOptions, rancherConfig, testSession, terraformConfig.Standalone.RancherHostname, keyPath, false)
 	require.NoError(t, err)
+
+	_, err = operations.ReplaceValue([]string{"rancher", "adminToken"}, client.RancherConfig.AdminToken, cattleConfig)
+	require.NoError(t, err)
+
+	rancherConfig, terraformConfig, terratestConfig, _ = config.LoadTFPConfigs(cattleConfig)
+	infraConfig.WriteConfigToFile(os.Getenv(configEnvironmentKey), cattleConfig)
 
 	if standaloneConfig.FeatureFlags != nil && standaloneConfig.FeatureFlags.Turtles != "" {
 		switch standaloneConfig.FeatureFlags.Turtles {

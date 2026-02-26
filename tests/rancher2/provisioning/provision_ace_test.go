@@ -64,8 +64,6 @@ func (p *ProvisionACETestSuite) TestTfpProvisionACE() {
 	var testUser, testPassword string
 	var clusterIDs []string
 
-	customClusterNames := []string{}
-
 	p.standardUserClient, testUser, testPassword, err = standarduser.CreateStandardUser(p.client)
 	require.NoError(p.T(), err)
 
@@ -113,7 +111,7 @@ func (p *ProvisionACETestSuite) TestTfpProvisionACE() {
 			adminClient, err := provisioning.FetchAdminClient(p.T(), p.client)
 			require.NoError(p.T(), err)
 
-			clusterIDs, _ := provisioning.Provision(p.T(), p.client, p.standardUserClient, rancher, terraform, terratest, testUser, testPassword, p.terraformOptions, configMap, newFile, rootBody, file, false, false, true, clusterIDs, customClusterNames)
+			clusterIDs, _ := provisioning.Provision(p.T(), p.client, p.standardUserClient, rancher, terraform, terratest, testUser, testPassword, p.terraformOptions, configMap, newFile, rootBody, file, false, false, true, clusterIDs, nil)
 			provisioning.VerifyClustersState(p.T(), adminClient, clusterIDs)
 			provisioning.VerifyServiceAccountTokenSecret(p.T(), adminClient, clusterIDs)
 
