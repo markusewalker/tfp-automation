@@ -2,7 +2,6 @@ package registries
 
 import (
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -77,62 +76,12 @@ func CreateMainTF(t *testing.T, terraformOptions *terraform.Options, keyPath str
 	serverTwoPublicDNS := terraform.Output(t, terraformOptions, serverTwoPublicDNS)
 	serverThreePublicDNS := terraform.Output(t, terraformOptions, serverThreePublicDNS)
 
-	// Will create the authenticated registry, unauthenticated registry, and global registry in parallel using goroutines.
-	var wg sync.WaitGroup
-	var mutex sync.Mutex
-	wg.Add(4)
-
-	go func() {
-		defer wg.Done()
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		file = sanity.OpenFile(file, keyPath)
-		logrus.Infof("Creating authenticated registry...")
-		file, err = registry.CreateAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, authRegistryPublicDNS)
-		if err != nil {
-			logrus.Fatalf("Error creating authenticated registry: %v", err)
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		file = sanity.OpenFile(file, keyPath)
-		logrus.Infof("Creating non-authenticated registry...")
-		file, err = registry.CreateNonAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, nonAuthRegistryPublicDNS, nonAuthRegistry)
-		if err != nil {
-			logrus.Fatalf("Error creating unauthenticated registry: %v", err)
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		file = sanity.OpenFile(file, keyPath)
-		logrus.Infof("Creating global registry...")
-		file, err = registry.CreateNonAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, globalRegistryPublicDNS, globalRegistry)
-		if err != nil {
-			logrus.Fatalf("Error creating global registry: %v", err)
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		file = sanity.OpenFile(file, keyPath)
-		logrus.Infof("Creating ecr registry...")
-		file, err = registry.CreateECRRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, ecrRegistryPublicDNS)
-		if err != nil {
-			logrus.Fatalf("Error creating ecr registry: %v", err)
-		}
-	}()
+	file = sanity.OpenFile(file, keyPath)
+	logrus.Infof("Creating non-authenticated registry...")
+	file, err = registry.CreateNonAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, nonAuthRegistryPublicDNS, nonAuthRegistry)
+	if err != nil {
+		logrus.Fatalf("Error creating unauthenticated registry: %v", err)
+	}
 
 	_, err = terraform.InitAndApplyE(t, terraformOptions)
 	if err != nil && *rancherConfig.Cleanup {
@@ -141,7 +90,47 @@ func CreateMainTF(t *testing.T, terraformOptions *terraform.Options, keyPath str
 		return "", "", "", err
 	}
 
-	wg.Wait()
+	file = sanity.OpenFile(file, keyPath)
+	logrus.Infof("Creating global registry...")
+	file, err = registry.CreateNonAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, globalRegistryPublicDNS, globalRegistry)
+	if err != nil {
+		logrus.Fatalf("Error creating global registry: %v", err)
+	}
+
+	_, err = terraform.InitAndApplyE(t, terraformOptions)
+	if err != nil && *rancherConfig.Cleanup {
+		logrus.Infof("Error while creating registries. Cleaning up...")
+		cleanup.Cleanup(t, terraformOptions, keyPath)
+		return "", "", "", err
+	}
+
+	file = sanity.OpenFile(file, keyPath)
+	logrus.Infof("Creating authenticated registry...")
+	file, err = registry.CreateAuthenticatedRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, authRegistryPublicDNS)
+	if err != nil {
+		logrus.Fatalf("Error creating authenticated registry: %v", err)
+	}
+
+	_, err = terraform.InitAndApplyE(t, terraformOptions)
+	if err != nil && *rancherConfig.Cleanup {
+		logrus.Infof("Error while creating registries. Cleaning up...")
+		cleanup.Cleanup(t, terraformOptions, keyPath)
+		return "", "", "", err
+	}
+
+	file = sanity.OpenFile(file, keyPath)
+	logrus.Infof("Creating ecr registry...")
+	file, err = registry.CreateECRRegistry(file, newFile, rootBody, terraformConfig, terratestConfig, ecrRegistryPublicDNS)
+	if err != nil {
+		logrus.Fatalf("Error creating ecr registry: %v", err)
+	}
+
+	_, err = terraform.InitAndApplyE(t, terraformOptions)
+	if err != nil && *rancherConfig.Cleanup {
+		logrus.Infof("Error while creating registries. Cleaning up...")
+		cleanup.Cleanup(t, terraformOptions, keyPath)
+		return "", "", "", err
+	}
 
 	file = sanity.OpenFile(file, keyPath)
 	logrus.Infof("Creating RKE2 cluster...")
