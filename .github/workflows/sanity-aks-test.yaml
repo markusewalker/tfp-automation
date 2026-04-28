@@ -45,6 +45,7 @@ env:
 jobs:
   v2-15:
     if: |
+      github.event_name == 'schedule' ||
       github.event.inputs.run_all_versions == 'true' ||
       (github.event_name == 'workflow_dispatch' && startsWith(github.event.inputs.rancher_version, 'head'))
     name: ${{ github.event.inputs.rancher_version }}
@@ -307,6 +308,7 @@ jobs:
 
   v2-14:
     if: |
+      github.event_name == 'schedule' ||
       github.event.inputs.run_all_versions == 'true' ||
       (github.event_name == 'workflow_dispatch' && startsWith(github.event.inputs.rancher_version, 'v2.14'))
     name: ${{ github.event.inputs.rancher_version }}
@@ -569,6 +571,7 @@ jobs:
 
   v2-13:
     if: |
+      github.event_name == 'schedule' ||
       github.event.inputs.run_all_versions == 'true' ||
       (github.event_name == 'workflow_dispatch' && startsWith(github.event.inputs.rancher_version, 'v2.13'))
     name: ${{ github.event.inputs.rancher_version }}
