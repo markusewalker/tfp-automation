@@ -2,6 +2,7 @@ package sanity
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -100,8 +101,10 @@ func (s *TfpSanityAKSProvisioningTestSuite) TestTfpProvisioningAKSSanity() {
 			logrus.Infof("Provisioning cluster (%s)", terraform.ResourcePrefix)
 			clusters, _ := provisioning.Provision(s.T(), s.client, s.standardUserClient, rancher, terraform, terratest, testUser, testPassword, perTestTerraformOptions, newFile, rootBody, file, false, false, true, "", nestedRancherModuleDir)
 
+			v3ID := strings.TrimPrefix(clusters[0].ID, "fleet-default/")
+
 			logrus.Infof("Verifying the cluster is ready (%s)", clusters[0].Name)
-			err = provisioningActions.VerifyClusterReady(s.client, clusters[0])
+			err = provisioningActions.VerifyClusterReadyV3(s.client, v3ID)
 			require.NoError(s.T(), err)
 
 			logrus.Infof("Verifying service account token secret (%s)", clusters[0].Name)
