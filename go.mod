@@ -52,9 +52,9 @@ require (
 	github.com/qase-tms/qase-go/qase-api-client v1.2.1
 	github.com/rancher/norman v0.8.1
 	github.com/rancher/rancher/pkg/apis v0.0.0
-	github.com/rancher/shepherd v0.0.0-20260417171403-fce40497b62e
-	github.com/rancher/tests v0.0.0-20260428161326-24be08863f41
-	github.com/rancher/tests/actions v0.0.0-20260428161326-24be08863f41
+	github.com/rancher/shepherd v0.0.0-20260427181519-3a8ec0abcf3c
+	github.com/rancher/tests v0.0.0-20260429161627-c59ac182d972
+	github.com/rancher/tests/actions v0.0.0-20260429161627-c59ac182d972
 	github.com/sirupsen/logrus v1.9.3
 )
 

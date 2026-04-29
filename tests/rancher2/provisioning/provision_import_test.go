@@ -115,8 +115,10 @@ func (p *UpgradeImportedClusterTestSuite) TestTfpUpgradeImportedCluster() {
 			logrus.Infof("Provisioning cluster (%s)", terraform.ResourcePrefix)
 			clusters, _ := provisioning.Provision(p.T(), p.client, p.standardUserClient, rancher, terraform, terratest, testUser, testPassword, perTestTerraformOptions, newFile, rootBody, file, false, false, true, "", nestedRancherModuleDir)
 
+			v3ID := strings.TrimPrefix(clusters[0].ID, "fleet-default/")
+
 			logrus.Infof("Verifying the cluster is ready (%s)", clusters[0].Name)
-			err = provisioningActions.VerifyClusterReady(p.client, clusters[0])
+			err = provisioningActions.VerifyClusterReadyV3(p.client, v3ID)
 			require.NoError(p.T(), err)
 
 			logrus.Infof("Verifying service account token secret (%s)", clusters[0].Name)
