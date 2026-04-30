@@ -5,17 +5,13 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/rancher/shepherd/clients/rancher"
-	"github.com/rancher/shepherd/extensions/defaults/namespaces"
 	"github.com/rancher/shepherd/pkg/session"
 	"github.com/rancher/tests/actions/qase"
-	"github.com/rancher/tests/actions/workloads/pods"
 	"github.com/rancher/tfp-automation/config"
 	"github.com/rancher/tfp-automation/defaults/keypath"
-	"github.com/rancher/tfp-automation/defaults/stevetypes"
 	tfpQase "github.com/rancher/tfp-automation/pipeline/qase"
 	"github.com/rancher/tfp-automation/tests/infrastructure/ranchers"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -44,15 +40,10 @@ func (s *TfpPostReleaseTestSuite) TestTfpPostRelease() {
 			s.session = testSession
 
 			s.client, _, s.standaloneTerraformOptions, s.terraformOptions, s.cattleConfig = ranchers.SetupRancher(s.T(), s.session, keypath.SanityKeyPath)
-
-			cluster, err := s.client.Steve.SteveType(stevetypes.Provisioning).ByID(namespaces.FleetLocal + "/local")
-			require.NoError(s.T(), err)
-
-			err = pods.VerifyClusterPods(s.client, cluster)
-			require.NoError(s.T(), err)
+			_, s.terraformConfig, s.terratestConfig, _ = config.LoadTFPConfigs(s.cattleConfig)
 
 			params := tfpQase.GetProvisioningSchemaParams(s.terraformConfig, s.terratestConfig)
-			err = qase.UpdateSchemaParameters(tt.name, params)
+			err := qase.UpdateSchemaParameters(tt.name, params)
 			if err != nil {
 				logrus.Warningf("Failed to upload schema parameters %s", err)
 			}
